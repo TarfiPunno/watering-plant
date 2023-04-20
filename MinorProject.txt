@@ -1,0 +1,45 @@
+Tarfi Punno(219001023)
+import org.firmata4j.I2CDevice;
+import org.firmata4j.IODevice;
+import org.firmata4j.firmata.FirmataDevice;
+import org.firmata4j.ssd1306.SSD1306;
+import java.io.IOException;
+import java.util.Timer;
+import org.firmata4j.Pin;
+
+
+public class MinorProject {
+    static final String port = "COM3";
+    static final byte I2C0 = 0x3c;
+    //D7 is the mosfet
+    // A0 is the moist sensor
+    static final int D7 = 7;
+    static final int A0 = 14;
+    public static void main(String[] args)
+            throws InterruptedException, IOException {
+        IODevice ArduinoBoard = new FirmataDevice(port);
+        try {
+            String Port = "COM3";
+
+            //Starts the board
+            ArduinoBoard.start();
+            ArduinoBoard.ensureInitializationIsDone();
+            I2CDevice i2cObject = ArduinoBoard.getI2CDevice(I2C0);
+            SSD1306 OLEDdisplay = new SSD1306(i2cObject, SSD1306.Size.SSD1306_128_64);
+            OLEDdisplay.init();
+            //Gets moisture and waterpump pin
+            Pin moisturesensor = ArduinoBoard.getPin(14);
+            Pin waterpump = ArduinoBoard.getPin(7);
+            waterpump.setMode(Pin.Mode.OUTPUT);
+            moisturesensor.setMode(Pin.Mode.ANALOG);
+            Timer timer = new Timer();
+            var Pin = new DetectMoisture(OLEDdisplay, moisturesensor, waterpump);
+            timer.schedule(Pin, 0, 1000);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+    }
+}

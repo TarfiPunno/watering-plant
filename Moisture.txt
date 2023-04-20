@@ -1,0 +1,52 @@
+Tarfi Punno(219001023)
+import org.firmata4j.ssd1306.SSD1306;
+import org.firmata4j.Pin;
+import java.util.TimerTask;
+public class DetectMoisture extends TimerTask
+{
+    private final SSD1306 OLEDdisplay;
+    private final Pin pin;
+    private final Pin pump;
+
+    public DetectMoisture (SSD1306 OLEDdisplay, Pin pin1, Pin pump)
+    {
+        this.OLEDdisplay = OLEDdisplay;
+        this.pin = pin1;
+        this.pump = pump;
+
+    }
+    public void run()
+    {
+        var Value = pin.getValue();
+        String n = String.valueOf("Value: "+ Value);
+        OLEDdisplay.getCanvas().clear();
+        OLEDdisplay.getCanvas().setTextsize(2);
+        OLEDdisplay.getCanvas().drawString(0,0,n);
+        OLEDdisplay.display();
+        System.out.println(Value);
+
+        try {
+            if (Value >= 600)
+            {
+                OLEDdisplay.getCanvas().setTextsize(2);
+                OLEDdisplay.getCanvas().drawString(0, 30, "Soil dry.");
+                OLEDdisplay.display();
+                this.pump.setValue(1);
+
+            } else
+            {
+                OLEDdisplay.getCanvas().setTextsize(2);
+                OLEDdisplay.getCanvas().drawString(0, 30, "Soil wet.");
+                OLEDdisplay.display();
+                this.pump.setValue(0);
+            }
+
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+
+    }
+
+}
